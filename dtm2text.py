@@ -6,6 +6,12 @@ import struct
 
 def byte_frames_from_file(movie):
     "Generate frame data from DTM movie."
+    frame_bytes = 8
+    while True:
+        frame = movie.read(frame_bytes)
+        if not frame:
+            break
+        yield frame
 
 
 def text_frames_from_bytes(frame_data):

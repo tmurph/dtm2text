@@ -37,6 +37,20 @@ def text_frame_from_bytes(frame_data):
 
 def byte_frame_from_text(frame_data):
     "Convert text frame data to DTM."
+    start_flag, a_flag, b_flag, x_flag, y_flag, z_flag, d_up, d_down, d_left, d_right, l_flag, r_flag, l, r, a_x, a_y, c_x, c_y = (int(b) for b in frame_data.split(":"))
+    flags = r_flag
+    flags = flags << 1 | l_flag
+    flags = flags << 1 | d_right
+    flags = flags << 1 | d_left
+    flags = flags << 1 | d_down
+    flags = flags << 1 | d_up
+    flags = flags << 1 | z_flag
+    flags = flags << 1 | y_flag
+    flags = flags << 1 | x_flag
+    flags = flags << 1 | b_flag
+    flags = flags << 1 | a_flag
+    flags = flags << 1 | start_flag
+    return struct.pack("H6B", flags, l, r, a_x, a_y, c_x, c_y)
 
 
 def text2dtm(argv=None):

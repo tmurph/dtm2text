@@ -62,14 +62,14 @@ def main(argv=None):
         with open(header_path, mode='wb') as bin_header_file:
             bin_header_file.write(header_bytes)
 
-            with open(frames_path, mode='w') as text_frames_file:
-                # Parse the frame data.
-                byte_frames = byte_frames_from_file(bin_movie_file)
-                text_frames = text_frames_from_bytes(byte_frames)
+        with open(frames_path, mode='w') as text_frames_file:
+            # Parse the frame data.
+            byte_frames = byte_frames_from_file(bin_movie_file)
+            text_frames = text_frames_from_bytes(byte_frames)
 
-                # Write the results.
-                for text_frame in text_frames:
-                    text_frames_file.write(text_frame + "\n")
+            # Write the results.
+            for text_frame in text_frames:
+                text_frames_file.write(text_frame + "\n")
 
     return 0
 

@@ -32,6 +32,8 @@ def test_text_frame_from_bytes(binary_data, text_data):
      b'\x00\x00\x00\x00\xff\x80\x80\x80'),
     ("0:1:0:0:0:0:0:0:0:0:0:0:0:0:255:128:128:128",
      b'\x02\x00\x00\x00\xff\x80\x80\x80'),
+    ("\n", b''),
+    ("# a comment", b''),
 ])
 def test_byte_frame_from_text(text_data, binary_data):
     "Can we parse frame data to bytes?"

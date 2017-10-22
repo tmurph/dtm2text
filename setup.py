@@ -8,7 +8,7 @@ def readme():
 
 tools.setup(
     name='dtm2text',
-    version='0.0.2',
+    version='0.0.3',
     description='Dump Dolphin TAS Movie files to plain text, and construct DTM from the same.',
     url='https://github.com/tmurph/dtm2text',
     license='GPL3',

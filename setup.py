@@ -27,6 +27,6 @@ tools.setup(
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
     entry_points={
-        'console_scripts': ['dtm2text=dtm2text:main']
+        'console_scripts': ['dtm2text=dtm2text:dtm2text']
     }
 )

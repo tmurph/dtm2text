@@ -35,11 +35,11 @@ def text_frame_from_bytes(frame_data):
     return ":".join(str(b) for b in button_data)
 
 
-def main(argv=None):
+def dtm2text(argv=None):
     if argv is None:
         argv = sys.argv
 
-    description = ('DTM <-> plain text')
+    description = ('Convert DTM to header file + plain text frame data.')
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('movie', help='the DTM to dump')
 
@@ -68,4 +68,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    sys.exit(dtm2text())

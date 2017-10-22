@@ -55,17 +55,19 @@ def main(argv=None):
     frames_path = "{}_frames.txt".format(movie_basename)
 
     with open(movie_path, mode='rb') as bin_movie_file:
-        with open(header_path, mode='wb') as bin_header_file:
-            with open(frames_path, mode='w') as text_frames_file:
-                # Advance the movie past the header.
-                header_bytes = bin_movie_file.read(header_bytes)
+        # This has the side effect of advancing the movie file.
+        # That's a good thing in our case.
+        header_bytes = bin_movie_file.read(header_bytes)
 
+        with open(header_path, mode='wb') as bin_header_file:
+            bin_header_file.write(header_bytes)
+
+            with open(frames_path, mode='w') as text_frames_file:
                 # Parse the frame data.
                 byte_frames = byte_frames_from_file(bin_movie_file)
                 text_frames = text_frames_from_bytes(byte_frames)
 
                 # Write the results.
-                bin_header_file.write(header_bytes)
                 for text_frame in text_frames:
                     text_frames_file.write(text_frame + "\n")
 

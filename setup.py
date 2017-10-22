@@ -21,6 +21,7 @@ tools.setup(
     long_description=readme(),
     author='Trevor Murphy',
     author_email='trevor.m.murphy@gmail.com',
+    scripts=['dtm2text.py'],
     packages=tools.find_packages(),
     zip_safe=False,
     include_package_data=True,

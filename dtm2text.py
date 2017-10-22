@@ -35,6 +35,41 @@ def text_frame_from_bytes(frame_data):
     return ":".join(str(b) for b in button_data)
 
 
+def byte_frame_from_text(frame_data):
+    "Convert text frame data to DTM."
+
+
+def text2dtm(argv=None):
+    if argv is None:
+        argv = sys.argv
+
+    description = ('Convert header + plain text frame data to DTM.')
+    parser = argparse.ArgumentParser(description=description,
+                                     fromfile_prefix_chars='@')
+    parser.add_argument('output', help='output file name')
+    parser.add_argument('header', help='256 byte header file')
+    parser.add_argument('frames', nargs='+',
+                        help='one file of frame data;'
+                        ' prefix with @ to use a from-file')
+
+    args = parser.parse_args(argv[1:])
+
+    movie_path = args.output
+    header_path = args.header
+    frame_paths = args.frames
+
+    with open(movie_path, mode='wb') as bin_movie_file:
+        with open(header_path, mode='rb') as bin_header_file:
+            bin_movie_file.write(bin_header_file.read())
+        for frame_path in frame_paths:
+            with open(frame_path, mode='r') as text_frames_file:
+                for text_frame in text_frames_file:
+                    byte_frame = byte_frame_from_text(text_frame)
+                    bin_movie_file.write(byte_frame)
+
+    return 0
+
+
 def dtm2text(argv=None):
     if argv is None:
         argv = sys.argv

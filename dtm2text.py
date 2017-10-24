@@ -2,6 +2,7 @@ import sys
 import argparse
 import os.path
 import struct
+from io import BytesIO
 
 
 def byte_frames_from_file(movie):
@@ -78,14 +79,20 @@ def text2dtm(argv=None):
     header_path = args.header
     frame_paths = args.frames
 
+    movie_data = BytesIO()
+
+    with open(header_path, mode='rb') as bin_header_file:
+        movie_data.write(bin_header_file.read())
+
+    for frame_path in frame_paths:
+        with open(frame_path, mode='r') as text_frames_file:
+            for text_frame in text_frames_file:
+                byte_frame = byte_frame_from_text(text_frame)
+                if byte_frame:
+                    movie_data.write(byte_frame)
+
     with open(movie_path, mode='wb') as bin_movie_file:
-        with open(header_path, mode='rb') as bin_header_file:
-            bin_movie_file.write(bin_header_file.read())
-        for frame_path in frame_paths:
-            with open(frame_path, mode='r') as text_frames_file:
-                for text_frame in text_frames_file:
-                    byte_frame = byte_frame_from_text(text_frame)
-                    bin_movie_file.write(byte_frame)
+        bin_movie_file.write(movie_data.getvalue())
 
     return 0
 

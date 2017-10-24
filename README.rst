@@ -5,31 +5,31 @@ Convert DTM to text and back
     :Author: Trevor Murphy
     :Contact: trevor.m.murphy@gmail.com
 
-This command line tool dumps your Dolphin TAS Movie files to a plain text list of frame data (plus a header file).
+This command line tool dumps your Dolphin TAS Movie files to a plain text list of input data (plus a header file).
 
 .. code:: sh
     :name: DTM to plain text
 
-    # creates YOUR_MOVIE_header and YOUR_MOVIE_frames.txt
     $ dtm2text YOUR_MOVIE
+    # creates YOUR_MOVIE_header and YOUR_MOVIE_inputs.txt
 
 Alternatively, you can piece together some plain text lists (plus a header file) into a DTM.
 
 .. code:: sh
     :name: Plain text to DTM
 
+    $ text2dtm NEW_MOVIE header_file inputs.txt
     # creates NEW_MOVIE
-    $ text2dtm NEW_MOVIE header_file frames.txt
 
-    # you can also supply several frames files
-    $ text2dtm NEW_MOVIE header_file frames_01.txt frames_02.txt
+    # you can supply several files of inputs
+    $ text2dtm NEW_MOVIE header_file inputs_01.txt inputs_02.txt
 
-    # if you have very many frames files, you can supply a from-file instead
-    $ cat frames_from_file
-    frames_01.txt
-    frames_02.txt
-    frames_03.txt
-    $ text2dtm NEW_MOVIE header_file @frames_from_file
+    # if you have lots of input files, you can supply a from-file instead
+    $ cat inputs_from_file
+    inputs_01.txt
+    inputs_02.txt
+    inputs_03.txt
+    $ text2dtm NEW_MOVIE header_file @inputs_from_file
 
 Requirements
 ------------

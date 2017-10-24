@@ -79,6 +79,7 @@ def text2dtm(argv=None):
     header_path = args.header
     frame_paths = args.frames
 
+    i = 0
     movie_data = BytesIO()
 
     with open(header_path, mode='rb') as bin_header_file:
@@ -89,7 +90,13 @@ def text2dtm(argv=None):
             for text_frame in text_frames_file:
                 byte_frame = byte_frame_from_text(text_frame)
                 if byte_frame:
+                    i += 1
                     movie_data.write(byte_frame)
+
+    movie_view = movie_data.getbuffer()
+    movie_view[13:21] = struct.pack("Q", i // 2)  # trick the frame data
+    movie_view[21:29] = struct.pack("Q", i)  # set the input count
+    movie_view[237:245] = struct.pack("Q", i * 2125000)  # trick the tick count
 
     with open(movie_path, mode='wb') as bin_movie_file:
         bin_movie_file.write(movie_data.getvalue())

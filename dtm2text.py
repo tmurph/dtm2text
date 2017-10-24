@@ -5,19 +5,19 @@ import struct
 from io import BytesIO
 
 
-def byte_frames_from_file(movie):
-    "Generate frame data from DTM movie."
-    frame_bytes = 8
+def byte_inputs_from_file(movie):
+    "Generate input data from DTM movie."
+    input_bytes = 8
     while True:
-        frame = movie.read(frame_bytes)
-        if not frame:
+        input_data = movie.read(input_bytes)
+        if not input_data:
             break
-        yield frame
+        yield input_data
 
 
-def text_frame_from_bytes(frame_data):
-    "Convert DTM frame data to text."
-    flags, l, r, a_x, a_y, c_x, c_y = struct.unpack("H6B", frame_data)
+def text_input_from_bytes(input_data):
+    "Convert DTM input data to text."
+    flags, l, r, a_x, a_y, c_x, c_y = struct.unpack("H6B", input_data)
     start_flag = flags & 1
     a_flag = flags >> 1 & 1
     b_flag = flags >> 2 & 1
@@ -36,14 +36,14 @@ def text_frame_from_bytes(frame_data):
     return ":".join(str(b) for b in button_data)
 
 
-def byte_frame_from_text(frame_data):
-    "Convert text frame data to DTM."
-    if frame_data == '\n':
+def byte_input_from_text(input_data):
+    "Convert text input data to DTM."
+    if input_data == '\n':
         result = b''
-    elif frame_data[0] == '#':
+    elif input_data[0] == '#':
         result = b''
     else:
-        start_flag, a_flag, b_flag, x_flag, y_flag, z_flag, d_up, d_down, d_left, d_right, l_flag, r_flag, l, r, a_x, a_y, c_x, c_y = (int(b) for b in frame_data.split(":"))
+        start_flag, a_flag, b_flag, x_flag, y_flag, z_flag, d_up, d_down, d_left, d_right, l_flag, r_flag, l, r, a_x, a_y, c_x, c_y = (int(b) for b in input_data.split(":"))
         flags = r_flag
         flags = flags << 1 | l_flag
         flags = flags << 1 | d_right
@@ -64,20 +64,20 @@ def text2dtm(argv=None):
     if argv is None:
         argv = sys.argv
 
-    description = ('Convert header + plain text frame data to DTM.')
+    description = ('Convert header + plain text input data to DTM.')
     parser = argparse.ArgumentParser(description=description,
                                      fromfile_prefix_chars='@')
     parser.add_argument('output', help='output file name')
     parser.add_argument('header', help='256 byte header file')
-    parser.add_argument('frames', nargs='+',
-                        help='one file of frame data;'
+    parser.add_argument('inputs', nargs='+',
+                        help='one file of input data;'
                         ' prefix with @ to use a from-file')
 
     args = parser.parse_args(argv[1:])
 
     movie_path = args.output
     header_path = args.header
-    frame_paths = args.frames
+    input_paths = args.inputs
 
     i = 0
     movie_data = BytesIO()
@@ -85,13 +85,13 @@ def text2dtm(argv=None):
     with open(header_path, mode='rb') as bin_header_file:
         movie_data.write(bin_header_file.read())
 
-    for frame_path in frame_paths:
-        with open(frame_path, mode='r') as text_frames_file:
-            for text_frame in text_frames_file:
-                byte_frame = byte_frame_from_text(text_frame)
-                if byte_frame:
+    for input_path in input_paths:
+        with open(input_path, mode='r') as text_input_file:
+            for text_input in text_input_file:
+                byte_input = byte_input_from_text(text_input)
+                if byte_input:
                     i += 1
-                    movie_data.write(byte_frame)
+                    movie_data.write(byte_input)
 
     movie_view = movie_data.getbuffer()
     movie_view[13:21] = struct.pack("Q", i // 2)  # trick the frame data
@@ -108,7 +108,7 @@ def dtm2text(argv=None):
     if argv is None:
         argv = sys.argv
 
-    description = ('Convert DTM to header file + plain text frame data.')
+    description = ('Convert DTM to header file + plain text input data.')
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('movie', help='the DTM to dump')
 
@@ -118,7 +118,7 @@ def dtm2text(argv=None):
     movie_basename = os.path.basename(movie_path)
     header_bytes = 256
     header_path = "{}_header".format(movie_basename)
-    frames_path = "{}_frames.txt".format(movie_basename)
+    input_path = "{}_inputs.txt".format(movie_basename)
 
     with open(movie_path, mode='rb') as bin_movie_file:
         # This has the side effect of advancing the movie file.
@@ -128,10 +128,10 @@ def dtm2text(argv=None):
         with open(header_path, mode='wb') as bin_header_file:
             bin_header_file.write(header_bytes)
 
-        with open(frames_path, mode='w') as text_frames_file:
-            for byte_frame in byte_frames_from_file(bin_movie_file):
-                text_frame = text_frame_from_bytes(byte_frame)
-                text_frames_file.write(text_frame + "\n")
+        with open(input_path, mode='w') as text_input_file:
+            for byte_input in byte_inputs_from_file(bin_movie_file):
+                text_input = text_input_from_bytes(byte_input)
+                text_input_file.write(text_input + "\n")
 
     return 0
 

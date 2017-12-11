@@ -69,15 +69,15 @@ def text2dtm(argv=None):
                                      fromfile_prefix_chars='@')
     parser.add_argument('output', help='output file name')
     parser.add_argument('header', help='256 byte header file')
-    parser.add_argument('inputs', nargs='+',
-                        help='one file of input data;'
-                        ' prefix with @ to use a from-file')
+    parser.add_argument('infile', nargs='?', default='-',
+                        help='file of inputs, one per line;'
+                        ' if none provided, defaults to stdin')
 
     args = parser.parse_args(argv[1:])
 
     movie_path = args.output
     header_path = args.header
-    input_paths = args.inputs
+    input_path = args.infile
 
     i = 0
     movie_data = BytesIO()
@@ -85,13 +85,12 @@ def text2dtm(argv=None):
     with open(header_path, mode='rb') as bin_header_file:
         movie_data.write(bin_header_file.read())
 
-    for input_path in input_paths:
-        with open(input_path, mode='r') if input_path is not '-' else sys.stdin as text_input_file:
-            for text_input in text_input_file:
-                byte_input = byte_input_from_text(text_input)
-                if byte_input:
-                    i += 1
-                    movie_data.write(byte_input)
+    with open(input_path, mode='r') if input_path is not '-' else sys.stdin as text_input_file:
+        for text_input in text_input_file:
+            byte_input = byte_input_from_text(text_input)
+            if byte_input:
+                i += 1
+                movie_data.write(byte_input)
 
     movie_view = movie_data.getbuffer()
     movie_view[13:21] = struct.pack("Q", i // 2)  # trick the frame data

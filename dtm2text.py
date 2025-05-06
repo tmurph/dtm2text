@@ -85,7 +85,7 @@ def text2dtm(argv=None):
     with open(header_path, mode='rb') as bin_header_file:
         movie_data.write(bin_header_file.read())
 
-    with open(input_path, mode='r') if input_path is not '-' else sys.stdin as text_input_file:
+    with open(input_path, mode='r') if input_path != '-' else sys.stdin as text_input_file:
         for text_input in text_input_file:
             byte_input = byte_input_from_text(text_input)
             if byte_input:

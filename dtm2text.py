@@ -3,6 +3,7 @@ import argparse
 import os.path
 import struct
 from io import BytesIO
+from pathlib import Path
 
 
 def byte_inputs_from_file(movie):
@@ -110,22 +111,35 @@ def dtm2text(argv=None):
     description = ('Convert DTM to header file + plain text input data.')
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('movie', help='the DTM to dump')
+    parser.add_argument('-o', '--output', default='', metavar='DIR', help='the output directory')
+    parser.add_argument('--no-header', action='store_true', help='only output the inputs.txt')
 
     args = parser.parse_args(argv[1:])
 
     movie_path = args.movie
     movie_basename = os.path.basename(movie_path)
     header_bytes = 256
-    header_path = "{}_header".format(movie_basename)
-    input_path = "{}_inputs.txt".format(movie_basename)
+    
+    output_dir = Path(__file__).resolve().parent
+    output_path = Path(args.output) if args.output else None
+    
+    if output_path and not output_path.exists():
+        print(f'error: output directory does not exist: {args.output}')
+        return
+    
+    output_dir = output_path or output_dir
+    
+    header_path = output_dir / f"{movie_basename}_header"
+    input_path = output_dir / f"{movie_basename}_inputs.txt"
 
     with open(movie_path, mode='rb') as bin_movie_file:
         # This has the side effect of advancing the movie file.
         # That's a good thing in our case.
         header_bytes = bin_movie_file.read(header_bytes)
 
-        with open(header_path, mode='wb') as bin_header_file:
-            bin_header_file.write(header_bytes)
+        if not args.no_header:
+            with open(header_path, mode='wb') as bin_header_file:
+                bin_header_file.write(header_bytes)
 
         with open(input_path, mode='w') as text_input_file:
             for byte_input in byte_inputs_from_file(bin_movie_file):
